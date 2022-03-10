@@ -1,0 +1,22 @@
+<?php
+require('config.php');
+$username = (isset($_POST['username']))? $_POST['username'] : '';
+$password = (isset($_POST['password']))? $_POST['password'] : '';
+
+$q = "SELECT username, role FROM USERS WHERE username = ? AND password = ?";
+$req = $bdd->prepare($q);
+$req->execute([$username, hash('sha256',$password)]);
+$results = $req->fetchAll();
+
+if (count($results) == 0){
+	header('Location: signin.php?msg=Erreur : pseudo ou mot de passe invalide');
+	exit;
+}
+else{
+	session_start();
+	$_SESSION['username'] = $username;
+	$_SESSION['role'] = $results[0]['role'];
+	header('Location: index.php');
+	exit;
+}
+?>
